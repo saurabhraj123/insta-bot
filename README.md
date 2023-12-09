@@ -1,8 +1,2 @@
-# NodeJS Starter Project
-
-Project bootstrapped using [NodeJS Starter ToolKit](https://github.com/vitorsalgado/create-nodejs-ts).  
-Visit the repository for more details.
-
-## Getting Started
-
-Review the generated code, and it's recommended to run a `npm init` to adjust basic project configurations before start.
+# Telgram bot to manage your instagram uploads
+The telegram bot provides an interface for you to connect your instagram account to the bot and then you can make uploads on your instagram account just by giving a insta-post url.
