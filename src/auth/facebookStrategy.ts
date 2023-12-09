@@ -10,7 +10,7 @@ export const getFacebookStrategy = () =>
       callbackURL: '/auth/facebook/callback',
     },
     function (accessToken, refreshToken, profile, cb) {
-      cb(null, { id: profile.id, token: accessToken })
+      cb(null, { token: accessToken })
     },
   )
 

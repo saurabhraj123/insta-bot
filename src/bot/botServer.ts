@@ -38,8 +38,9 @@ const startBotServer = async () => {
 
     // add account
     async function addAccount(conversation: MyConversation, ctx: MyContext) {
+      const telegramUserId = ctx.from?.id
       ctx.reply(
-        `<b>Click on the given link to add an account:</b> <a href="http://www.localhost:3000/auth/facebook">here</a>`,
+        `<b>Click on the given link to add an account:</b> <a href="http://www.localhost:3000/auth/facebook?telegramUserId=${telegramUserId}">here</a>`,
         { parse_mode: 'HTML' },
       )
       return

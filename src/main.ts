@@ -2,6 +2,7 @@
 import 'dotenv/config'
 import express from 'express'
 import passport from 'passport'
+import cookieParser from 'cookie-parser'
 import connectToDatabase from './db/connection.js'
 import { getExpressSession, getFacebookStrategy } from './auth/facebookStrategy.js'
 
@@ -18,14 +19,12 @@ const startServer = async () => {
     await connectToDatabase()
 
     // middlewares
-    app.use(passport.initialize())
+    app.use(cookieParser())
     app.use(getExpressSession())
+    app.use(passport.initialize())
+    app.use(passport.session())
     passport.use(getFacebookStrategy())
     app.use('/', routeHandler)
-
-    /** passport user serialization, deserialization */
-    serializeUser()
-    deserializeUser()
 
     /** Start server */
     const PORT = process.env.PORT || 8080
@@ -33,9 +32,12 @@ const startServer = async () => {
       // eslint-disable-next-line no-console
       console.log(`Server is running on port ${PORT}`)
 
-      // start bot server
       startBotServer()
     })
+
+    /** passport user serialization, deserialization */
+    serializeUser()
+    deserializeUser()
   } catch (err) {
     // eslint-disable-next-line no-console
     console.log('something went wrong in starting the server', err)
