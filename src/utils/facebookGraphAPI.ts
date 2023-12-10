@@ -37,15 +37,15 @@ export const getInstagramBusinessAccountIds = async (facebookPageIds: string[], 
 
 export const getInstaPageIdsWithName = async (instagramBusinessAccountIds: string[], accessToken: string) => {
   try {
-    const instaPageIdsWithName: { [key: string]: string } = {}
+    const instaPageIdsWithName: { id: string; name: string; username: string }[] = []
 
     for (const instagramBusinessAccountId of instagramBusinessAccountIds) {
       const { data } = await axios.get(
-        `${FACEBOOK_GRAPH_API_BASE_URL}/${instagramBusinessAccountId}?fields=name&access_token=${accessToken}`,
+        `${FACEBOOK_GRAPH_API_BASE_URL}/${instagramBusinessAccountId}?fields=name,username&access_token=${accessToken}`,
       )
 
-      const instagramBusinessAccountName = data?.name
-      if (instagramBusinessAccountName) instaPageIdsWithName[instagramBusinessAccountId] = instagramBusinessAccountName
+      const { name, username } = data
+      if (name && username) instaPageIdsWithName.push({ id: instagramBusinessAccountId, name, username })
     }
 
     return instaPageIdsWithName

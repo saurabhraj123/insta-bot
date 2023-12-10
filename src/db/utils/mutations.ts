@@ -1,5 +1,11 @@
-export const addNewUser = async (token: string, telegramUserId: string) => {
-  token = '1'
-  telegramUserId = '2'
-  token = telegramUserId
+/** Internal */
+import User, { UserType } from '../../db/schema/UserSchema.js'
+
+export const addNewUser = async (user: UserType) => {
+  try {
+    const newUser = new User(user)
+    await newUser.save()
+  } catch (err) {
+    throw err
+  }
 }
