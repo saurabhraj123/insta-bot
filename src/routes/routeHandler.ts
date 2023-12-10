@@ -1,10 +1,11 @@
 /** External */
+import _ from 'lodash'
 import express from 'express'
 import passport from 'passport'
 const router = express.Router()
 
 /** Internal */
-import { getInstaPageDetailsAndAddToDb } from '../utils/facebookGraphAPI.js'
+import { getInstaPageDetails } from '../utils/facebookGraphAPI.js'
 
 router.get('/', async (req, res) => {
   try {
@@ -13,7 +14,9 @@ router.get('/', async (req, res) => {
       const telegramUserId = req.cookies.telegramUserId
 
       if (token && telegramUserId) {
-        await getInstaPageDetailsAndAddToDb(token)
+        const instaPageDetails = await getInstaPageDetails(token)
+        console.log('instaPageDetails', instaPageDetails)
+        // const user = combineUserDetails(telegramUserId, )
         return res.send('Your account is now connected. Go to telegram to use it...')
       }
 
@@ -29,8 +32,11 @@ router.get('/', async (req, res) => {
 router.get(
   '/auth/facebook',
   (req, res, next) => {
-    const { telegramUserId } = req.query as { telegramUserId: string }
-    res.cookie('telegramUserId', telegramUserId, { maxAge: 900000, httpOnly: true })
+    // Loop through all query parameters using lodash forEach
+    _.forEach(req.query, (value, key) => {
+      // Set each query parameter as a cookie
+      res.cookie(key, value, { maxAge: 900000, httpOnly: true })
+    })
 
     next()
   },

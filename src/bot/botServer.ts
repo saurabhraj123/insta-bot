@@ -38,11 +38,23 @@ const startBotServer = async () => {
 
     // add account
     async function addAccount(conversation: MyConversation, ctx: MyContext) {
-      const telegramUserId = ctx.from?.id
-      ctx.reply(
-        `<b>Click on the given link to add an account:</b> <a href="http://www.localhost:3000/auth/facebook?telegramUserId=${telegramUserId}">here</a>`,
-        { parse_mode: 'HTML' },
-      )
+      const user = ctx.from
+      if (user) {
+        const { id, first_name, last_name, username } = user
+
+        const queryParams = [
+          `telegramUserId=${id}`,
+          first_name && `first_name=${first_name}`,
+          last_name && `last_name=${last_name}`,
+          username && `username=${username}`,
+        ].filter(Boolean)
+
+        const link = `http://www.localhost:3000/auth/facebook?${queryParams.join('&')}`
+
+        ctx.reply(`<b>Click on the given link to add an account:</b> <a href="${link}">here</a>`, {
+          parse_mode: 'HTML',
+        })
+      }
       return
     }
 
