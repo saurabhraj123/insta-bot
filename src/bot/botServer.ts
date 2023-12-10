@@ -1,35 +1,13 @@
 /** External */
-import { Bot, Context, session } from 'grammy'
-import { type Conversation, type ConversationFlavor, conversations, createConversation } from '@grammyjs/conversations'
+import { Bot, session } from 'grammy'
+import { conversations, createConversation } from '@grammyjs/conversations'
 
 /** Internal */
-import { getBotDescription } from './botUtils.js'
+import { getBotDescription, uploadConversationHandler } from './botUtils.js'
+import { MyContext, MyConversation } from 'src/types/botTypes.js'
 
 const startBotServer = async () => {
   try {
-    type MyContext = Context & ConversationFlavor
-    type MyConversation = Conversation<MyContext>
-
-    // upload conversation handler
-    async function upload(conversation: MyConversation, ctx: MyContext) {
-      if (3 > 2) {
-        await ctx.reply('You have no accounts linked! Use /add_account to link your account.')
-        return
-      }
-
-      await ctx.reply('How many favorite movies do you have?')
-      const count = await conversation.form.number()
-      const movies: string[] = []
-      for (let i = 0; i < count; i++) {
-        await ctx.reply(`Tell me number ${i + 1}!`)
-        const titleCtx = await conversation.waitFor(':text')
-        movies.push(titleCtx.msg.text)
-      }
-      await ctx.reply('Here is a better ranking!')
-      movies.sort()
-      await ctx.reply(movies.map((m, i) => `${i + 1}. ${m}`).join('\n'))
-    }
-
     // manage accounts
     async function manageAccounts(conversation: MyConversation, ctx: MyContext) {
       ctx.reply('Manage accounts')
@@ -64,7 +42,7 @@ const startBotServer = async () => {
     // middlewares
     bot.use(session({ initial: () => ({}) }))
     bot.use(conversations())
-    bot.use(createConversation(upload))
+    bot.use(createConversation(uploadConversationHandler, 'upload'))
     bot.use(createConversation(addAccount))
     bot.use(createConversation(manageAccounts))
 

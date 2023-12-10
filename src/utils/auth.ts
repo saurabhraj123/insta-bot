@@ -3,7 +3,7 @@ import express from 'express'
 
 /** Internal */
 import { getInstaPageDetails } from '../utils/facebookGraphAPI.js'
-import { getUserPayload } from './user.js'
+import { getUser, getUserPayload } from './user.js'
 import { addNewUser } from '../db/utils/mutations.js'
 
 export const handleAuthenticatedUser = async (req: express.Request, res: express.Response) => {
@@ -18,4 +18,13 @@ export const handleAuthenticatedUser = async (req: express.Request, res: express
   }
 
   return res.status(400).send('Error 400. Bad request.')
+}
+
+export const getAccessToken = async (userId: string) => {
+  try {
+    const user = await getUser(userId)
+    return user?.facebookAccessToken
+  } catch (err) {
+    throw err
+  }
 }

@@ -15,7 +15,7 @@ const UserSchema = new mongoose.Schema({
   first_name: String,
   last_name: String,
   username: String,
-  facebookAccessToken: String,
+  facebookAccessToken: { type: String, unique: true, dropDups: true },
   instagramBusinessAccounts: [{ id: String, username: String, name: String }],
 })
 
