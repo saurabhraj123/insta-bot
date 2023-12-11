@@ -24,17 +24,20 @@ export const uploadConversationHandler = async (conversation: MyConversation, ct
   if (id) {
     const facebookAccessToken = await getAccessToken(id.toString())
     if (facebookAccessToken) {
-      while (true) {
-        ctx.reply('Please enter the instagram post link to re-upload')
+      ctx.reply('Please enter the instagram post link to re-upload')
+      const postUrlCtx = await conversation.waitFor(':text')
+      let postUrl = postUrlCtx.msg.text
+
+      if (postUrl === '/cancel')
+        return ctx.reply(`Operation cancelled.\n\n${getBotDescription()}`, { parse_mode: 'HTML' })
+
+      while (!isInstagramPostUrl(postUrlCtx.msg.text)) {
+        ctx.reply('Please enter a valid instagram post url. Enter /cancel to go to main menu.')
         const postUrlCtx = await conversation.waitFor(':text')
-        const postUrl = postUrlCtx.msg.text
+        postUrl = postUrlCtx.msg.text
 
-        if (postUrl === '/cancel') return ctx.reply(`Cancelled operation.\n${getBotDescription()}`)
-
-        if (!isInstagramPostUrl(postUrlCtx.msg.text))
-          ctx.reply('Please enter a valid instagram post url. Enter /cancel to go to main menu.')
-
-        break
+        if (postUrl === '/cancel')
+          return ctx.reply(`Operation cancelled.\n\n${getBotDescription()}`, { parse_mode: 'HTML' })
       }
 
       // while (true) {
