@@ -3,7 +3,7 @@ import _ from 'lodash'
 import axios from 'axios'
 
 /** variables */
-const userGraphQlData: { [key: string]: string } = {}
+const instaPostGraphqlData: { [key: string]: string } = {}
 
 /** types */
 interface GraphqlData {
@@ -61,7 +61,7 @@ const getVideoDownloadUrl = (graphqlData: GraphqlData) => {
 }
 
 const getHtmlFormattedMenuString = (caption: string, mediaType: MediaType) => {
-  return `<b>Fetched details:</b>
+  return `
 <b>Caption:</b> 
 ${caption}
 
@@ -77,16 +77,21 @@ Enter /cancel to go to main menu.
 }
 
 /** Public functions */
-export const getMediaDetailsMenu = async (userId: string, instagramPostUrl: string) => {
+export const getMediaDetailsMenu = async (userId: string, instagramPostUrl: string, updatedCaption?: string) => {
   const postId = getPostIdFromUrl(instagramPostUrl)
   if (!postId) return null
 
-  const graphqlData = await getGraphqlDataFromPostId(postId)
-  if (!graphqlData) return null
+  let graphqlData = null
+  if (instaPostGraphqlData[userId]) {
+    graphqlData = JSON.parse(instaPostGraphqlData[userId])
+  } else {
+    graphqlData = await getGraphqlDataFromPostId(postId)
+    if (!graphqlData) return null
+    instaPostGraphqlData[userId] = JSON.stringify(graphqlData)
+  }
 
-  userGraphQlData[userId] = JSON.stringify(graphqlData)
-
-  const caption = getCaption(graphqlData)
+  let caption = updatedCaption
+  if (!updatedCaption) caption = getCaption(graphqlData)
   if (!caption) return null
 
   const mediaType = getMediaType(graphqlData)

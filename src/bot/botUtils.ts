@@ -47,11 +47,41 @@ export const uploadConversationHandler = async (conversation: MyConversation, ct
 
       const htmlFormattedMenuString = await getMediaDetailsMenu(id.toString(), postUrl)
       if (!htmlFormattedMenuString)
-        return ctx.reply(`Invalid post url. Please try again later.\n\n${getBotDescription()}`, {
+        return ctx.reply(`Invalid post url. Please try again...\n\n${getBotDescription()}`, {
           parse_mode: 'HTML',
         })
 
-      ctx.reply(htmlFormattedMenuString, { parse_mode: 'HTML' })
+      ctx.reply(`Fetched details:${htmlFormattedMenuString}`, { parse_mode: 'HTML' })
+
+      do {
+        const selectedOptionCtx = await conversation.waitFor(':text')
+        const selectedOption = selectedOptionCtx.msg.text
+
+        if (selectedOption === '/cancel') return replyWithBotDescription(ctx)
+
+        if (selectedOption === '1') {
+          ctx.reply('Please wait while we upload your media...')
+          break
+        } else if (selectedOption === '2') {
+          ctx.reply('Enter the new caption')
+          const captionCtx = await conversation.waitFor(':text')
+          const caption = captionCtx.msg.text
+
+          if (caption === '/cancel') return replyWithBotDescription(ctx)
+
+          if (!caption) ctx.reply('Invalid caption. Try again...\n\n Enter /cancel to go to main menu.')
+
+          const htmlFormattedMenuString = await getMediaDetailsMenu(id.toString(), postUrl, caption)
+          if (!htmlFormattedMenuString)
+            return ctx.reply(`Something went wrong. Please try again...\n\n${getBotDescription()}`, {
+              parse_mode: 'HTML',
+            })
+
+          ctx.reply(`<b>Updated details:</b>\n${htmlFormattedMenuString}`, { parse_mode: 'HTML' })
+        } else {
+          ctx.reply('Invalid option. Try again...\n\n Enter /cancel to go to main menu.')
+        }
+      } while (true)
 
       // while (true) {
       //   ctx.reply('Please enter the caption:')
