@@ -1,5 +1,6 @@
 /** Internal */
 import { getAccessToken } from '../utils/auth.js'
+import { getMediaDetailsMenu } from '../utils/downloader.js'
 import { MyConversation, MyContext } from '../types/botTypes.js'
 
 export const isInstagramPostUrl = (url: string) => {
@@ -19,6 +20,10 @@ Lets you re-upload a media on instagram to your account.
 <b>4. /cancel</b> - Cancel the current operation`
 }
 
+const replyWithBotDescription = (ctx: MyContext) => {
+  ctx.reply(getBotDescription(), { parse_mode: 'HTML' })
+}
+
 export const uploadConversationHandler = async (conversation: MyConversation, ctx: MyContext) => {
   const id = ctx.from?.id
   if (id) {
@@ -28,17 +33,25 @@ export const uploadConversationHandler = async (conversation: MyConversation, ct
       const postUrlCtx = await conversation.waitFor(':text')
       let postUrl = postUrlCtx.msg.text
 
-      if (postUrl === '/cancel')
-        return ctx.reply(`Operation cancelled.\n\n${getBotDescription()}`, { parse_mode: 'HTML' })
+      if (postUrl === '/cancel') return replyWithBotDescription(ctx)
 
-      while (!isInstagramPostUrl(postUrlCtx.msg.text)) {
+      while (!isInstagramPostUrl(postUrl)) {
         ctx.reply('Please enter a valid instagram post url. Enter /cancel to go to main menu.')
         const postUrlCtx = await conversation.waitFor(':text')
         postUrl = postUrlCtx.msg.text
 
-        if (postUrl === '/cancel')
-          return ctx.reply(`Operation cancelled.\n\n${getBotDescription()}`, { parse_mode: 'HTML' })
+        if (postUrl === '/cancel') return replyWithBotDescription(ctx)
       }
+
+      ctx.reply('Processing your request please wait...')
+
+      const htmlFormattedMenuString = await getMediaDetailsMenu(id.toString(), postUrl)
+      if (!htmlFormattedMenuString)
+        return ctx.reply(`Invalid post url. Please try again later.\n\n${getBotDescription()}`, {
+          parse_mode: 'HTML',
+        })
+
+      ctx.reply(htmlFormattedMenuString, { parse_mode: 'HTML' })
 
       // while (true) {
       //   ctx.reply('Please enter the caption:')
