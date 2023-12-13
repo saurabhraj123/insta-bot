@@ -82,12 +82,12 @@ export const getMediaDetailsMenu = async (userId: string, instagramPostUrl: stri
   if (!postId) return null
 
   let graphqlData = null
-  if (instaPostGraphqlData[userId]) {
-    graphqlData = JSON.parse(instaPostGraphqlData[userId])
+  if (instaPostGraphqlData[postId]) {
+    graphqlData = JSON.parse(instaPostGraphqlData[postId])
   } else {
     graphqlData = await getGraphqlDataFromPostId(postId)
     if (!graphqlData) return null
-    instaPostGraphqlData[userId] = JSON.stringify(graphqlData)
+    instaPostGraphqlData[postId] = JSON.stringify(graphqlData)
   }
 
   let caption = updatedCaption
